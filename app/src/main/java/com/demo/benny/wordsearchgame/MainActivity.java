@@ -1,7 +1,6 @@
 package com.demo.benny.wordsearchgame;
 
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -42,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements GridItemTouchList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        titleText = (TextView) findViewById(R.id.title);
-        remainingText = (TextView) findViewById(R.id.remaining);
-        refreshButton = (ImageButton) findViewById(R.id.refresh);
-        recyclerView = (RecyclerView) findViewById(R.id.grid);
+        titleText = findViewById(R.id.title);
+        remainingText = findViewById(R.id.remaining);
+        refreshButton = findViewById(R.id.refresh);
+        recyclerView = findViewById(R.id.grid);
 
         recyclerView.setHasFixedSize(true);
         gridItemTouchListener = new GridItemTouchListener(this);
@@ -178,13 +177,7 @@ public class MainActivity extends AppCompatActivity implements GridItemTouchList
 
         if (stateFragment.model.matchPositions(positions)) {
             Toast.makeText(this, "nice one :)", Toast.LENGTH_SHORT).show();
-            Handler h = new Handler();
-            h.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    nextState();
-                }
-            }, 1000);
+            nextState();
         } else {
             gridItemTouchListener.unselectSelection();
         }
