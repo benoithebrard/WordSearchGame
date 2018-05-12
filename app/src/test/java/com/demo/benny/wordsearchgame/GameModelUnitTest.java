@@ -10,7 +10,8 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Example local unit test, which will execute on the development machine (host).
+ * Testing of the game data and state. A sample JSON string is used to describe the game.
+ * User input is simulated by hard-coded positions.
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
@@ -36,32 +37,38 @@ public class GameModelUnitTest {
         "target_language": "es"
     }*/
 
+    /*
+     * Test that swiping a valid word is correctly validated by the game
+     */
     @Test
     public void match_valid() throws Exception {
         JSONObject json = new JSONObject(SAMPLE_JSON);
-        GameModel model = new GameModel(json);
-        assertEquals(model.getNbRemainingTargets(), 2);
+        Game word = new Game(json);
+        assertEquals(word.getNbRemainingWords(), 2);
 
         List<Integer> positions = new ArrayList<>(Arrays.asList(44, 45, 46, 47));
-        assertTrue(model.matchPositions(positions));
-        assertEquals(model.getNbRemainingTargets(), 1);
+        assertTrue(word.matchPositions(positions));
+        assertEquals(word.getNbRemainingWords(), 1);
 
         positions = new ArrayList<>(Arrays.asList(16, 17, 18, 19, 20));
-        assertTrue(model.matchPositions(positions));
-        assertEquals(model.getNbRemainingTargets(), 0);
+        assertTrue(word.matchPositions(positions));
+        assertEquals(word.getNbRemainingWords(), 0);
     }
 
+    /*
+     * Test that swiping an invalid word is correctly invalidated by the game
+     */
     @Test
     public void match_invalid() throws Exception {
         JSONObject json = new JSONObject(SAMPLE_JSON);
-        GameModel model = new GameModel(json);
+        Game word = new Game(json);
 
         List<Integer> positions = new ArrayList<>(Arrays.asList(34, 35, 36, 37));
-        assertFalse(model.matchPositions(positions));
-        assertEquals(model.getNbRemainingTargets(), 2);
+        assertFalse(word.matchPositions(positions));
+        assertEquals(word.getNbRemainingWords(), 2);
 
         positions = new ArrayList<>(Arrays.asList(16, 17, 18, 19, 20, 21));
-        assertFalse(model.matchPositions(positions));
-        assertEquals(model.getNbRemainingTargets(), 2);
+        assertFalse(word.matchPositions(positions));
+        assertEquals(word.getNbRemainingWords(), 2);
     }
 }

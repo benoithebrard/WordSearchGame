@@ -15,31 +15,31 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/game"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
+
+        <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="6dp"
+            android:padding="3dp"
             android:textAlignment="center"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="16sp" />
+            android:text="@string/loading"
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/remaining"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:alpha=".8"
-            android:padding="6sp"
+            android:padding="3sp"
             android:textColor="@color/colorAccent"
-            android:textSize="14sp" />
-
-        <ImageButton
-            android:id="@+id/refresh"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/ic_refresh_black_36dp"
-            android:contentDescription="@string/refresh"
-            android:onClick="onRefreshClicked"
-            android:visibility="gone" />
+            android:textSize="16sp" />
 
     </LinearLayout>
 

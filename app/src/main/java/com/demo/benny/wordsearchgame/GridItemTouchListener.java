@@ -8,18 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Benny on 17/08/2017.
- * Filters out touch events so that only valid words get selected
+ * This class listens for swipe inputs and calls callback functions when a word or a letter
+ * gets selected. The swipe movement has to be horizontal, vertical or diagonal.
  */
 
 class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
 
-    private final GridItemCallbacks listener;
-    private int nbColumns = -1;
-    private final List<Integer> selectedPos = new ArrayList<>();
+    private final SelectedListener mListener;
+    private int mNbColumns = -1;
+    private final List<Integer> mPositions = new ArrayList<>();
 
-    public void setSpanCount(int spanCount) {
-        nbColumns = spanCount;
+    public void setNbColumns(int nbColumns) {
+        mNbColumns = nbColumns;
     }
 
     private enum Direction {
@@ -29,14 +29,17 @@ class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
         UNKNOWN
     }
 
-    public interface GridItemCallbacks {
+    /**
+     * Callback functions when a letter or a word has been selected.
+     */
+    public interface SelectedListener {
         void onWordSelected(List<Integer> positions);
 
         void onLetterSelected(int position, boolean b);
     }
 
-    public GridItemTouchListener(GridItemCallbacks callbacks) {
-        listener = callbacks;
+    GridItemTouchListener(SelectedListener listener) {
+        mListener = listener;
     }
 
     private int lastPos;
@@ -65,7 +68,7 @@ class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
                 // Determine select direction
                 // Improve diagonal detection by filtering out other directions below margin
                 if (direction == Direction.UNKNOWN) {
-                    int margin = rv.getMeasuredWidth() / nbColumns * 2 / 3;
+                    int margin = rv.getMeasuredWidth() / mNbColumns * 2 / 3;
                     int deltaX = (int) (e.getX() - startX);
                     int deltaY = (int) (e.getY() - startY);
                     if (isDiagonal(position)) {
@@ -93,65 +96,62 @@ class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
                 break;
             case MotionEvent.ACTION_UP:
                 // Send back result
-                listener.onWordSelected(selectedPos);
+                mListener.onWordSelected(mPositions);
                 break;
         }
         return false;
     }
 
+    /**
+     * Utility functions
+     */
     private boolean isRight(int position) {
-        int row = lastPos / nbColumns;
-        return position / nbColumns == row;
+        int row = lastPos / mNbColumns;
+        return position / mNbColumns == row;
     }
 
     private boolean isDown(int position) {
-        int column = lastPos % nbColumns;
-        return position % nbColumns == column;
+        int column = lastPos % mNbColumns;
+        return position % mNbColumns == column;
     }
 
     private boolean isDiagonal(int position) {
-        int row = lastPos / nbColumns;
-        int column = lastPos % nbColumns;
-        int deltaRow = position / nbColumns - row;
-        int deltaColumn = position % nbColumns - column;
+        int row = lastPos / mNbColumns;
+        int column = lastPos % mNbColumns;
+        int deltaRow = position / mNbColumns - row;
+        int deltaColumn = position % mNbColumns - column;
         return deltaRow == deltaColumn;
     }
 
     private void selectFirst(int position) {
-        selectedPos.add(position);
-        listener.onLetterSelected(position, true);
+        mPositions.add(position);
+        mListener.onLetterSelected(position, true);
         lastPos = position;
     }
 
     private void selectRight(int position) {
         for (int i = lastPos + 1; i <= position; i++) {
-            selectedPos.add(i);
-            listener.onLetterSelected(i, true);
+            mPositions.add(i);
+            mListener.onLetterSelected(i, true);
         }
     }
 
     private void selectDown(int position) {
-        for (int i = lastPos + nbColumns; i <= position; i += nbColumns) {
-            selectedPos.add(i);
-            listener.onLetterSelected(i, true);
+        for (int i = lastPos + mNbColumns; i <= position; i += mNbColumns) {
+            mPositions.add(i);
+            mListener.onLetterSelected(i, true);
         }
     }
 
     private void selectDiagonal(int position) {
-        for (int i = lastPos + nbColumns + 1; i <= position; i += nbColumns + 1) {
-            selectedPos.add(i);
-            listener.onLetterSelected(i, true);
-        }
-    }
-
-    void unselectSelection() {
-        for (int i = 0; i < selectedPos.size(); i++) {
-            listener.onLetterSelected(selectedPos.get(i), false);
+        for (int i = lastPos + mNbColumns + 1; i <= position; i += mNbColumns + 1) {
+            mPositions.add(i);
+            mListener.onLetterSelected(i, true);
         }
     }
 
     private void clear() {
-        selectedPos.clear();
+        mPositions.clear();
         lastPos = -1;
         direction = Direction.UNKNOWN;
         startX = -1;

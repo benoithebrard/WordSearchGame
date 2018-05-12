@@ -11,51 +11,33 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Benny on 18/08/2017.
- * Parse, store and match game model data
- * JSON data follows this format:
- * {
- * "source_language": "en",
- * "word": "girl",
- * "character_grid": [
- * ["o", "s", "\u00f3", "x", "h", "\u00f1", "h"],
- * ["\u00fc", "r", "g", "o", "l", "\u00fa", "b"],
- * ["a", "t", "c", "h", "i", "c", "a"],
- * ["u", "\u00fa", "r", "w", "\u00e1", "t", "\u00e9"],
- * ["p", "n", "v", "r", "q", "m", "l"],
- * ["f", "d", "t", "e", "a", "\u00f3", "l"],
- * ["u", "t", "n", "i", "\u00f1", "a", "s"]
- * ],
- * "word_locations": {
- * "2,2,3,2,4,2,5,2,6,2": "chica",
- * "2,6,3,6,4,6,5,6": "ni\u00f1a"
- * },
- * "target_language": "es"
- * }
+ * This class represents the game´s data and state. It parses a JSON file and converts it to data
+ * structures. User input can modify the game´s state through functions.
  */
+class Game {
+    private String mWordToTranslate;
+    private String mSourceLanguage;
+    private String mTargetLanguage;
+    private int mNbColumns;
+    private final List<String> mLetters = new ArrayList<>();
+    private final Map<String, String> mWordLocations = new HashMap<>();
+    private final Map<String, Boolean> mFoundWords = new HashMap<>();
 
-class GameModel {
-
-    private String word = null;
-    private String sourceLanguage = null;
-    private String targetLanguage = null;
-    private int nbColumns = -1;
-    private final List<String> letters = new ArrayList<>();
-    private final Map<String, String> targetLocations = new HashMap<>();
-    private final Map<String, Boolean> targetsFound = new HashMap<>();
-
-    public GameModel(JSONObject json) {
+    /**
+     * Converts JSON object to game object
+     */
+    Game(JSONObject json) {
         try {
-            word = json.getString("word");
-            sourceLanguage = json.getString("source_language");
-            targetLanguage = json.getString("target_language");
+            mWordToTranslate = json.getString("word");
+            mSourceLanguage = json.getString("source_language");
+            mTargetLanguage = json.getString("target_language");
             // Convert character grid into array
             JSONArray characterGrid = json.getJSONArray("character_grid");
-            nbColumns = characterGrid.length();
-            for (int i = 0; i < nbColumns; i++) {
+            mNbColumns = characterGrid.length();
+            for (int i = 0; i < mNbColumns; i++) {
                 JSONArray row = characterGrid.getJSONArray(i);
                 for (int j = 0; j < row.length(); j++) {
-                    letters.add(row.getString(j));
+                    mLetters.add(row.getString(j));
                 }
             }
             // Extract word locations
@@ -64,8 +46,8 @@ class GameModel {
             while (keys.hasNext()) {
                 String key = keys.next();
                 String value = locations.optString(key);
-                targetLocations.put(key, value);
-                targetsFound.put(key, false);
+                mWordLocations.put(key, value);
+                mFoundWords.put(key, false);
             }
 
         } catch (JSONException e) {
@@ -73,41 +55,48 @@ class GameModel {
         }
     }
 
-    public String getWord() {
-        return word;
+    /**
+     * Getters
+     */
+    public String getWordToTranslate() {
+        return mWordToTranslate;
     }
 
-    public String getSourceLanguage() {
-        return sourceLanguage;
-    }
+    public String getSourceLanguage() { return mSourceLanguage; }
 
-    public String getTargetLanguage() {
-        return targetLanguage;
-    }
+    public String getTargetLanguage() { return mTargetLanguage; }
 
     public int getNbColumns() {
-        return nbColumns;
+        return mNbColumns;
     }
 
     public List<String> getLetters() {
-        return letters;
+        return mLetters;
     }
 
-    public int getNbRemainingTargets() {
-        int nbRemaining = targetLocations.size();
-        for (String key : targetsFound.keySet()) {
-            if (targetsFound.get(key)) {
+    /**
+     * Compute the number of words that haven´t been found yet
+     */
+    public int getNbRemainingWords() {
+        int nbRemaining = mWordLocations.size();
+        for (String key : mFoundWords.keySet()) {
+            // If a word has been found, it is not counted as remaining anymore
+            if (mFoundWords.get(key)) {
                 nbRemaining--;
             }
         }
         return nbRemaining;
     }
 
+    /**
+     * Convert found words´s (X,Y) coordinates into grid positions
+     * For example for "chica": "2,2,3,2,4,2,5,2,6,2" --> grid positions "7, 8, 9, 10"
+     */
     public List<Integer> getSelectedPositions() {
         List<Integer> selectedPositions = new ArrayList<>();
-        for (String key : targetsFound.keySet()) {
+        for (String key : mFoundWords.keySet()) {
             // Convert found targets to positions
-            if (targetsFound.get(key)) {
+            if (mFoundWords.get(key)) {
                 for (int i = 0; i < key.length() - 2; i += 4) {
                     int position = locationToPosition(key.charAt(i), key.charAt(i + 2));
                     selectedPositions.add(position);
@@ -117,13 +106,17 @@ class GameModel {
         return selectedPositions;
     }
 
+    /**
+     * Try to match the user´s selected grid positions with any of the words that haven´t
+     * been found yet.
+     */
     public boolean matchPositions(List<Integer> positions) {
         boolean success = false;
-        for (String key : targetLocations.keySet()) {
+        for (String key : mWordLocations.keySet()) {
             // Check that both coordinates and letters match
-            if (matchCoordinates(positions, key) && matchWord(positions, targetLocations.get(key))) {
-                // Mark target as found
-                targetsFound.put(key, true);
+            if (matchCoordinates(positions, key) && matchWord(positions, mWordLocations.get(key))) {
+                // Mark word as found
+                mFoundWords.put(key, true);
                 success = true;
                 break;
             }
@@ -131,6 +124,19 @@ class GameModel {
         return success;
     }
 
+    /**
+     * Clear game by resetting found words
+     */
+    public void clear() {
+        for (String key : mFoundWords.keySet()) {
+            // Clear found words
+            mFoundWords.put(key, false);
+        }
+    }
+
+    /**
+     * Utility functions
+     */
     private boolean matchCoordinates(List<Integer> positions, String location) {
         int nbPositions = (location.length() + 1) / 4;
         int nbMatches = 0;
@@ -151,20 +157,21 @@ class GameModel {
     private int locationToPosition(char charX, char charY) {
         int x = Character.getNumericValue(charX);
         int y = Character.getNumericValue(charY);
-        return x + y * nbColumns;
+        return x + y * mNbColumns;
     }
 
-    private boolean matchWord(List<Integer> positions, String targetWord) {
-        return targetWord.length() == positions.size() && positionsToWord(positions).equalsIgnoreCase(targetWord);
+    private boolean matchWord(List<Integer> positions, String word) {
+        return word.length() == positions.size() && positionsToWord(positions).equalsIgnoreCase(word);
     }
 
     private String positionsToWord(List<Integer> positions) {
         StringBuilder decoded = new StringBuilder();
         for (int i = 0; i < positions.size(); i++) {
-            String letter = letters.get(positions.get(i));
+            String letter = mLetters.get(positions.get(i));
             decoded.append(letter);
         }
         return decoded.toString();
     }
+
 
 }

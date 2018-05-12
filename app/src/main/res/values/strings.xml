@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">WordSearchGame</string>
-    <string name="refresh">refresh</string>
-    <string name="loading_games">Loading new games…</string>
-    <string name="loading_failed">Loading failed, press to retry</string>
     <string name="translate">Translate</string>
     <string name="from">from</string>
     <string name="to">to</string>
-    <string name="find">Find</string>
-    <string name="word">word</string>
+    <string name="remaining">Look for %d word</string>
+    <string name="english">English</string>
+    <string name="spanish">Spanish</string>
+    <string name="loading">Loading..</string>
+    <string name="game">Game %d/%d</string>
 </resources>
