@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright 2017, The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,26 +14,16 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:baselineAligned="false"
-    tools:context="com.demo.benny.wordsearchgame.MainActivity">
+    tools:context="com.demo.benny.wordsearchgame.FragmentGrid">
 
-    <fragment
-        android:id="@+id/fragmentText"
-        android:name="com.demo.benny.wordsearchgame.FragmentText"
-        android:layout_width="0dp"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/grid"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="2" />
+        android:scrollbars="vertical" />
 
-    <fragment
-        android:id="@+id/fragmentGrid"
-        android:name="com.demo.benny.wordsearchgame.FragmentGrid"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="3" />
-</LinearLayout>
+</FrameLayout>

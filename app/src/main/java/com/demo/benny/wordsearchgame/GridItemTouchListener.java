@@ -8,17 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class listens for swipe inputs and calls callback functions when a word or a letter
- * gets selected. The swipe movement has to be horizontal, vertical or diagonal.
+ * This class listens for touch events and notify a listener.
+ * The touch movement must be forward and in a horizontal, vertical or diagonal direction.
  */
-
 class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
 
-    private final SelectedListener mListener;
-    private int mNbColumns = -1;
+    private int mNbColumns;
     private final List<Integer> mPositions = new ArrayList<>();
+    private ItemTouchListener mTouchListener;
 
-    public void setNbColumns(int nbColumns) {
+    GridItemTouchListener(int nbColumns) {
         mNbColumns = nbColumns;
     }
 
@@ -27,19 +26,6 @@ class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
         DOWN,
         DIAGONAL,
         UNKNOWN
-    }
-
-    /**
-     * Callback functions when a letter or a word has been selected.
-     */
-    public interface SelectedListener {
-        void onWordSelected(List<Integer> positions);
-
-        void onLetterSelected(int position, boolean b);
-    }
-
-    GridItemTouchListener(SelectedListener listener) {
-        mListener = listener;
     }
 
     private int lastPos;
@@ -96,7 +82,7 @@ class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
                 break;
             case MotionEvent.ACTION_UP:
                 // Send back result
-                mListener.onWordSelected(mPositions);
+                if (mTouchListener != null) mTouchListener.onWordSelected(mPositions);
                 break;
         }
         return false;
@@ -125,28 +111,28 @@ class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
 
     private void selectFirst(int position) {
         mPositions.add(position);
-        mListener.onLetterSelected(position, true);
+        if (mTouchListener != null ) mTouchListener.onLetterSelected(position, true);
         lastPos = position;
     }
 
     private void selectRight(int position) {
         for (int i = lastPos + 1; i <= position; i++) {
             mPositions.add(i);
-            mListener.onLetterSelected(i, true);
+            if (mTouchListener != null ) mTouchListener.onLetterSelected(i, true);
         }
     }
 
     private void selectDown(int position) {
         for (int i = lastPos + mNbColumns; i <= position; i += mNbColumns) {
             mPositions.add(i);
-            mListener.onLetterSelected(i, true);
+            if (mTouchListener != null ) mTouchListener.onLetterSelected(i, true);
         }
     }
 
     private void selectDiagonal(int position) {
         for (int i = lastPos + mNbColumns + 1; i <= position; i += mNbColumns + 1) {
             mPositions.add(i);
-            mListener.onLetterSelected(i, true);
+            if (mTouchListener != null ) mTouchListener.onLetterSelected(i, true);
         }
     }
 
@@ -166,6 +152,18 @@ class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
     @Override
     public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
+    }
+
+    // Allows touch events to be caught
+    void setTouchListener(GridItemTouchListener.ItemTouchListener itemTouchListener) {
+        mTouchListener = itemTouchListener;
+    }
+
+    // Parent activity will implement this method to respond to touch events
+    public interface ItemTouchListener {
+        void onWordSelected(List<Integer> positions);
+
+        void onLetterSelected(int position, boolean b);
     }
 
 }
