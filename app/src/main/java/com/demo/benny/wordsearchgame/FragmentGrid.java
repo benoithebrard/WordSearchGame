@@ -59,7 +59,7 @@ public class FragmentGrid extends Fragment implements GridItemTouchListener.Item
 
         // setup layout manager and adapter
         mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), nbColumns));
-        mAdapter = new GridRecyclerViewAdapter(getContext(), mGame.getLetters(), 6);
+        mAdapter = new GridRecyclerViewAdapter(getContext(), mGame.getLetters(), nbColumns);
         mRecyclerView.setAdapter(mAdapter);
 
         // setup touch listener

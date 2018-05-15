@@ -1,10 +1,8 @@
 package com.demo.benny.wordsearchgame;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +18,6 @@ import java.util.List;
 public class GridRecyclerViewAdapter extends RecyclerView.Adapter<GridRecyclerViewAdapter.ViewHolder> {
 
     private final int mNbColumns;
-    private final int mScreenWidth;
     private List<String> mData;
     private List<Integer> mHighlighted;
     private LayoutInflater mInflater;
@@ -31,9 +28,6 @@ public class GridRecyclerViewAdapter extends RecyclerView.Adapter<GridRecyclerVi
         this.mData = data;
         this.mNbColumns = nbColumns;
         mHighlighted = new ArrayList<>(Collections.nCopies(data.size(), 0));
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        mScreenWidth = displaymetrics.widthPixels;
     }
 
     // Inflates the cell layout from xml when needed
@@ -41,8 +35,7 @@ public class GridRecyclerViewAdapter extends RecyclerView.Adapter<GridRecyclerVi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.recyclerview_item, parent, false);
         // Make the cells square by adjusting cell height dynamically
-        int parentWidth = parent.getMeasuredWidth();
-        view.getLayoutParams().height = (parentWidth > 0 ? parentWidth : mScreenWidth * 3/5) / mNbColumns;
+        view.getLayoutParams().height = parent.getMeasuredWidth() / mNbColumns;
         return new ViewHolder(view);
     }
 

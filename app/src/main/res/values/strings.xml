@@ -3,7 +3,7 @@
     <string name="translate">Translate</string>
     <string name="from">from</string>
     <string name="to">to</string>
-    <string name="remaining">Look for %d word</string>
+    <string name="remaining">Look for %d more word</string>
     <string name="english">English</string>
     <string name="spanish">Spanish</string>
     <string name="loading">Loading&#8230;</string>
