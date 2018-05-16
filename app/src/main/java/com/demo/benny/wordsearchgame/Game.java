@@ -14,7 +14,7 @@ import java.util.Map;
  * This class represents the game´s data and state. It parses a JSON file and converts it to data
  * structures. User input can modify the game´s state through functions.
  */
-class Game {
+public class Game {
     private String mWordToTranslate;
     private String mSourceLanguage;
     private String mTargetLanguage;

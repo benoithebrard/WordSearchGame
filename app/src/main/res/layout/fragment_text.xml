@@ -1,77 +1,77 @@
-<!--
-  ~ Copyright 2017, The Android Open Source Project
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~      http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.demo.benny.wordsearchgame.FragmentText"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="8dp">
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="model"
+            type="com.demo.benny.wordsearchgame.GameViewModel" />
+    </data>
 
     <LinearLayout
-        android:id="@+id/command"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="horizontal"
-        android:visibility="invisible">
+        android:orientation="vertical"
+        android:padding="8dp"
+        tools:context="com.demo.benny.wordsearchgame.FragmentText">
 
-        <Button
-            android:id="@+id/previous"
-            android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:padding="3dp"
-            android:text="@string/left_arrow" />
-
-        <TextView
-            android:id="@+id/game"
+        <LinearLayout
+            android:id="@+id/command"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="14sp" />
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="@{model.nbGames > 0 ? View.VISIBLE : View.INVISIBLE}">
 
-        <Button
-            android:id="@+id/next"
-            android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:padding="3dp"
-            android:text="@string/right_arrow" />
+            <Button
+                android:id="@+id/previous"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:onClick="@{() -> model.loadPreviousGame()}"
+                android:padding="3dp"
+                android:text="@string/left_arrow" />
+
+            <TextView
+                android:id="@+id/game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                android:text="@{@string/game(model.currentGameIndex + 1, model.nbGames)}"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/next"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:onClick="@{() -> model.loadNextGame()}"
+                android:padding="3dp"
+                android:text="@string/right_arrow" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3sp"
+            android:text="@{model.title}"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/remaining"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha=".8"
+            android:padding="3sp"
+            android:visibility="@{model.nbGames > 0 ? View.VISIBLE : View.INVISIBLE}"
+            android:text="@{@string/remaining(model.nbRemaining)}"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="3sp"
-        android:textAlignment="center"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="@string/loading"
-        android:textSize="18sp" />
-
-    <TextView
-        android:id="@+id/remaining"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:alpha=".8"
-        android:padding="3sp"
-        android:textColor="@color/colorAccent"
-        android:textSize="16sp" />
-
-</LinearLayout>
+</layout>

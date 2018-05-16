@@ -87,22 +87,16 @@ public class FragmentGrid extends Fragment implements GridItemTouchListener.Item
     public void onWordSelected(List<Integer> positions) {
         if (mGame.matchPositions(positions)) {
             Toast.makeText(getActivity(), "nice one :)", Toast.LENGTH_SHORT).show();
-            nextState();
+            // check if all words have been discovered
+            int nbRemaining = mGame.getNbRemainingWords();
+            if (nbRemaining > 0) {
+                mGameViewModel.nbRemaining.set(nbRemaining);
+            } else {
+                mGame.clear();
+                mGameViewModel.loadNextGame();
+            }
         } else {
             unselectAll(positions);
-        }
-    }
-
-    /**
-     * Check what the next UI´s state should be
-     */
-    private void nextState() {
-        int nbRemainingWords = mGame.getNbRemainingWords();
-        if (nbRemainingWords > 0) {
-            mGameViewModel.nbRemainingWords.setValue(nbRemainingWords);
-        } else {
-            mGame.clear();
-            mGameViewModel.loadNextGame();
         }
     }
 

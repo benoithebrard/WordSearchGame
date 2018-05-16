@@ -3,6 +3,9 @@ package com.demo.benny.wordsearchgame;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.databinding.ObservableField;
+import android.databinding.ObservableInt;
+import android.text.Spanned;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,9 +25,11 @@ public class GameViewModel extends ViewModel {
 
     private static final String URL = "https://s3.amazonaws.com/duolingo-data/s3/js2/find_challenges.txt";
     private MutableLiveData<List<Game>> mGames;
-    private int currentGameIndex = 0;
     public MutableLiveData<Game> currentGame = new MutableLiveData<>();
-    public MutableLiveData<Integer> nbRemainingWords = new MutableLiveData<>();
+    public final ObservableInt currentGameIndex = new ObservableInt(0);
+    public final ObservableInt nbGames = new ObservableInt(0);
+    public final ObservableInt nbRemaining = new ObservableInt(0);
+    public final ObservableField<Spanned> title = new ObservableField<>();
 
     /**
      * Returns the list of all available games. If the list is not already cached, it is retrieved
@@ -36,34 +41,6 @@ public class GameViewModel extends ViewModel {
             loadGames();
         }
         return mGames;
-    }
-
-    public int getCurrentGameIndex() {
-        return currentGameIndex;
-    }
-
-    /**
-     * Navigate between games
-     */
-    public void loadCurrentGame() {
-        List<Game> games = mGames.getValue();
-        if (games != null) currentGame.setValue(games.get(currentGameIndex));
-    }
-
-    public void loadNextGame() {
-        List<Game> games = mGames.getValue();
-        if (games != null) {
-            currentGameIndex = ++currentGameIndex % games.size();
-            currentGame.setValue(games.get(currentGameIndex));
-        }
-    }
-
-    public void loadPreviousGame() {
-        List<Game> games = mGames.getValue();
-        if (games != null) {
-            currentGameIndex = currentGameIndex == 0 ? games.size() - 1 : --currentGameIndex;
-            currentGame.setValue(games.get(currentGameIndex));
-        }
     }
 
     /**
@@ -106,6 +83,32 @@ public class GameViewModel extends ViewModel {
                 mGames.postValue(newGames);
             }
         }).start();
+    }
+
+    /**
+     * Navigate between games
+     */
+    public void loadCurrentGame() {
+        List<Game> games = mGames.getValue();
+        if (games != null) currentGame.setValue(games.get(currentGameIndex.get()));
+    }
+
+    public void loadNextGame() {
+        List<Game> games = mGames.getValue();
+        if (games != null) {
+            int index = currentGameIndex.get();
+            currentGameIndex.set(++index % games.size());
+            currentGame.setValue(games.get(currentGameIndex.get()));
+        }
+    }
+
+    public void loadPreviousGame() {
+        List<Game> games = mGames.getValue();
+        if (games != null) {
+            int index = currentGameIndex.get();
+            currentGameIndex.set(index == 0 ? games.size() - 1 : --index);
+            currentGame.setValue(games.get(currentGameIndex.get()));
+        }
     }
 
 }

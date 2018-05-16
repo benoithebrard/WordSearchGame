@@ -38,6 +38,7 @@ class GridItemTouchListener implements RecyclerView.OnItemTouchListener {
         // find the view that got the touch event
         View childView = rv.findChildViewUnder(e.getX(), e.getY());
         int position = rv.getChildLayoutPosition(childView);
+        if (position == -1) return false;
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:
