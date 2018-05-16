@@ -21,6 +21,7 @@ public class GridRecyclerViewAdapter extends RecyclerView.Adapter<GridRecyclerVi
     private List<String> mData;
     private List<Integer> mHighlighted;
     private LayoutInflater mInflater;
+    private int mHeight = 0;
 
     // Data is passed into the constructor
     GridRecyclerViewAdapter(Context context, List<String> data, int nbColumns) {
@@ -35,7 +36,10 @@ public class GridRecyclerViewAdapter extends RecyclerView.Adapter<GridRecyclerVi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.recyclerview_item, parent, false);
         // Make the cells square by adjusting cell height dynamically
-        view.getLayoutParams().height = parent.getMeasuredWidth() / mNbColumns;
+        if (mHeight == 0) {
+            mHeight = parent.getMeasuredWidth() / mNbColumns;
+        }
+        view.getLayoutParams().height = mHeight;
         return new ViewHolder(view);
     }
 
